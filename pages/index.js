@@ -7,7 +7,7 @@ import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
 function ProfileSideBar(props) {
 
   return (
-    <Box>
+    <Box as="aside">
       <img src={`https://github.com/${props.githubUser}.png`} alt="Imagem de usuário" style={{ borderRadius: '8px' }} />
       <hr />
       <p>
@@ -25,6 +25,7 @@ function ProfileSideBar(props) {
 export default function Home() {
   const userGithub = 'rnldourado'
   const [comunidades, setComunidades] = React.useState([{
+    id: '471874515487516841',
     title: 'Eu odeio acordar cedo',
     image: 'https://alurakut.vercel.app/capa-comunidade-01.jpg'
   }]);
@@ -54,6 +55,7 @@ export default function Home() {
               console.log('Campo: ',dadosDoForm.get('image'))
 
               const comunidade = {
+                id: new Date().toISOString(),
                 titulo: dadosDoForm.get('title'),
                 image: dadosDoForm.get('image')
 
@@ -85,12 +87,12 @@ export default function Home() {
 
         <div className="profileRelationsArea" style={{ gridArea: 'profileRelationsArea' }}>
           <ProfileRelationsBoxWrapper >
-          <h2 className="smallTitle">Comunidades </h2>
+          <h2 className="smallTitle">Comunidades ({comunidades.length})</h2>
             <ul>
               {comunidades.map((itemAtual) => {
                 return (
-                  <li>
-                    <a href={`/users/${itemAtual.title}`} key={itemAtual.title}>
+                  <li key={itemAtual.id}>
+                    <a href={`/users/${itemAtual.title}`} >
                       <img src={itemAtual.image} alt={`${itemAtual.title}`} />
                       <span>{itemAtual.title}</span>
                     </a>
@@ -101,12 +103,12 @@ export default function Home() {
           </ProfileRelationsBoxWrapper >
 
           <ProfileRelationsBoxWrapper >
-            <h2 className="smallTitle">Pessoas da comunidade {pessoasFavoritas.length}</h2>
+            <h2 className="smallTitle">Pessoas da comunidade ({pessoasFavoritas.length})</h2>
             <ul>
               {pessoasFavoritas.map((itemAtual) => {
                 return (
-                  <li>
-                    <a href={`/users/${itemAtual}`} key={itemAtual}>
+                  <li key={itemAtual}>
+                    <a href={`/users/${itemAtual}`} >
                       <img src={`https://github.com/${itemAtual}.png`} alt={`${itemAtual}`} />
                       <span>{itemAtual}</span>
                     </a>
