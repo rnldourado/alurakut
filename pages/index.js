@@ -22,6 +22,27 @@ function ProfileSideBar(props) {
   )
 }
 
+function ProfileRelationsBox(propriedades) {
+  return (
+
+    <ProfileRelationsBoxWrapper >
+      <h2 className="smallTitle"> {propriedades.title} ({propriedades.items.length})</h2>
+      <ul>
+        {/* {seguidores.map((itemAtual) => {
+                return (
+                  <li key={itemAtual}>
+                    <a href={`https//github.com/${itemAtual}.png`} >
+                      <img src={itemAtual.image} alt={`${itemAtual.title}`} />
+                      <span>{itemAtual.title}</span>
+                    </a>
+                  </li>
+                )
+              })} */}
+      </ul>
+    </ProfileRelationsBoxWrapper >
+  )
+}
+
 export default function Home() {
   const userGithub = 'rnldourado'
   const [comunidades, setComunidades] = React.useState([{
@@ -31,6 +52,20 @@ export default function Home() {
   }]);
   console.log(comunidades)
   const pessoasFavoritas = ['juunegreiros', 'omariosouto', 'rafaballerini', 'peas', 'marcobrunodev', 'felipefialho']
+
+  const [seguidores, setSeguidores] = React.useState([]);
+
+  React.useEffect(function () {
+    fetch('https://api.github.com/users/rnldourado/followers')
+      .then(function (respostaDoServidor) {
+        return respostaDoServidor.json();
+      })
+      .then(function (respostaCompleta) {
+        setSeguidores(respostaCompleta)
+      })
+  }, [])
+
+  console.log('seguidores antes do return', seguidores)
 
   return (
     <>
@@ -51,8 +86,8 @@ export default function Home() {
               e.preventDefault();
               const dadosDoForm = new FormData(e.target);
 
-              console.log('Campo: ',dadosDoForm.get('title'))
-              console.log('Campo: ',dadosDoForm.get('image'))
+              console.log('Campo: ', dadosDoForm.get('title'))
+              console.log('Campo: ', dadosDoForm.get('image'))
 
               const comunidade = {
                 id: new Date().toISOString(),
@@ -86,8 +121,9 @@ export default function Home() {
         </div>
 
         <div className="profileRelationsArea" style={{ gridArea: 'profileRelationsArea' }}>
+          <ProfileRelationsBox title="Seguidores" items={seguidores} />
           <ProfileRelationsBoxWrapper >
-          <h2 className="smallTitle">Comunidades ({comunidades.length})</h2>
+            <h2 className="smallTitle">Comunidades ({comunidades.length})</h2>
             <ul>
               {comunidades.map((itemAtual) => {
                 return (
