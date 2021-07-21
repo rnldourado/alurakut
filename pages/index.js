@@ -59,7 +59,7 @@ export default function Home() {
 
   React.useEffect(function() {
     // GET
-    fetch('https://api.github.com/users/peas/followers')
+    fetch('https://api.github.com/users/rnldourado/followers')
     .then(function (respostaDoServidor) {
       return respostaDoServidor.json();
     })
