@@ -3,6 +3,8 @@ import React from 'react'
 import Box from '../src/components/Box/';
 import { AlurakutMenu, OrkutNostalgicIconSet, AlurakutProfileSidebarMenuDefault } from '../src/lib/AlurakutCommons';
 import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
+import nookies from 'nookies'
+import jwt from 'jsonwebtoken'
 
 function ProfileSideBar(props) {
 
@@ -43,29 +45,29 @@ function ProfileRelationsBox(propriedades) {
   )
 }
 
-export default function Home() {
-  const userGithub = 'rnldourado'
+export default function Home(props) {
+  const userGithub = props.githubUser
   const [comunidades, setComunidades] = React.useState([]);
   const pessoasFavoritas = [
-    'juunegreiros',
+    'danielhe4rt',
     'omariosouto',
     'rafaballerini',
-    'peas',
+    'pachicodes',
     'marcobrunodev',
-    'felipefialho'
+    'maykbrito'
   ]
 
   const [seguidores, setSeguidores] = React.useState([]);
 
-  React.useEffect(function() {
+  React.useEffect(function () {
     // GET
     fetch('https://api.github.com/users/rnldourado/followers')
-    .then(function (respostaDoServidor) {
-      return respostaDoServidor.json();
-    })
-    .then(function(respostaCompleta) {
-      setSeguidores(respostaCompleta);
-    })
+      .then(function (respostaDoServidor) {
+        return respostaDoServidor.json();
+      })
+      .then(function (respostaCompleta) {
+        setSeguidores(respostaCompleta);
+      })
 
 
     // API GraphQL
@@ -76,7 +78,8 @@ export default function Home() {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
-      body: JSON.stringify({ "query": `query {
+      body: JSON.stringify({
+        "query": `query {
         allCommunities {
           id 
           title
@@ -85,19 +88,17 @@ export default function Home() {
         }
       }` })
     })
-    .then((response) => response.json()) // Pega o retorno do response.json() e já retorna
-    .then((respostaCompleta) => {
-      const comunidadesVindasDoDato = respostaCompleta.data.allCommunities;
-      console.log(comunidadesVindasDoDato)
-      setComunidades(comunidadesVindasDoDato)
-    })
+      .then((response) => response.json()) // Pega o retorno do response.json() e já retorna
+      .then((respostaCompleta) => {
+        const comunidadesVindasDoDato = respostaCompleta.data.allCommunities;
+        console.log(comunidadesVindasDoDato)
+        setComunidades(comunidadesVindasDoDato)
+      })
     // .then(function (response) {
     //   return response.json()
     // })
 
   }, [])
-
-  console.log('seguidores antes do return', seguidores);
 
   // 1 - Criar um box que vai ter um map, baseado nos items do array
   // que pegamos do GitHub
@@ -118,25 +119,25 @@ export default function Home() {
           <Box>
             <h2 className="subTitle">O que você deseja fazer?</h2>
             <form onSubmit={function handleCriaComunidade(e) {
-                e.preventDefault();
-                const dadosDoForm = new FormData(e.target);
+              e.preventDefault();
+              const dadosDoForm = new FormData(e.target);
 
-                console.log('Campo: ', dadosDoForm.get('title'));
-                console.log('Campo: ', dadosDoForm.get('image'));
+              console.log('Campo: ', dadosDoForm.get('title'));
+              console.log('Campo: ', dadosDoForm.get('image'));
 
-                const comunidade = {
-                  title: dadosDoForm.get('title'),
-                  imageUrl: dadosDoForm.get('image'),
-                  creatorSlug: userGithub,
-                }
+              const comunidade = {
+                title: dadosDoForm.get('title'),
+                imageUrl: dadosDoForm.get('image'),
+                creatorSlug: userGithub,
+              }
 
-                fetch('/api/comunidades', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify(comunidade)
-                })
+              fetch('/api/comunidades', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(comunidade)
+              })
                 .then(async (response) => {
                   const dados = await response.json();
                   console.log(dados.registroCriado);
@@ -151,7 +152,7 @@ export default function Home() {
                   name="title"
                   aria-label="Qual vai ser o nome da sua comunidade?"
                   type="text"
-                  />
+                />
               </div>
               <div>
                 <input
@@ -205,4 +206,31 @@ export default function Home() {
       </MainGrid>
     </>
   )
+}
+
+export async function getServerSideProps(context) {
+  const cookies = nookies.get(context)
+  const token = cookies.USER_TOKEN;
+  const { isAuthenticated } = await fetch('https://alurakut.vercel.app/api/auth', {
+    headers: {
+        Authorization: token
+      }
+  })
+  .then((resposta) => resposta.json())
+
+  if(!isAuthenticated) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      }
+    }
+  }
+
+  const { githubUser } = jwt.decode(token);
+  return {
+    props: {
+      githubUser
+    }, // will be passed to the page component as props
+  }
 }

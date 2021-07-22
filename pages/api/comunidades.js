@@ -10,8 +10,8 @@ export default async function recebedorDeRequests(request, response) {
             itemType: "976602", // ID do Model de "Communities" criado pelo Dato
             ...request.body,
             // title: "Comunidade de Teste",
-            // imageUrl: "https://github.com/omariosouto.png",
-            // creatorSlug: "omariosouto"
+            // imageUrl: "https://github.com/rnldourado.png",
+            // creatorSlug: "rnldourado"
         })
     
         console.log(registroCriado);
