@@ -47,10 +47,7 @@ export default function LoginScreen() {
               onChange={(infosDoEvento) => {
                 setGithubUser(infosDoEvento.target.value)
               }} />
-            {githubUser.length === 0
-              ? 'Preencha o campo'
-              : ''
-            }
+
             <button type="submit">
               Login
             </button>
